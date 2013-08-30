@@ -1,0 +1,53 @@
+﻿<table class="table table-bordered table-hover">
+    <tr ng-repeat="(key,val) in datasource" class="row-{{key}}">
+        <td class="col-{{key}} cell">
+            <span class="k">{{key}}</span>
+            <span ng-switch on="isObject(val)">
+                <span ng-switch-when="notObject"></span>
+                <span ng-switch-when="null"></span>
+                <span ng-switch-default>
+                    <span class="btn btn-link" data-toggle="collapse" data-target="#collapse_{{getPathWithoutDot(documentpath, key)}}" ng-click="changeColumnStatus(documentpath, key)">[{{getColumnStatusText(documentpath, key)}}]</span>
+                    <span class="pull-right btn btn-link add-button" data-toggle="modal" data-target="#newItemModal_{{getPathWithoutDot(documentpath, key)}}"><i class="icon-file"></i></span>
+                    <newitemdialog modalid="newItemModal_{{getPathWithoutDot(documentpath, key)}}" document="document" documentpath="{{documentpath + '.' + key}}" viewobj="val" />
+                </span>
+            </span>
+        </td>
+        <td class="col-val">
+            <div ng-switch on="isObject(val)">
+                <div ng-switch-when="object">
+                    <div id="collapse_{{getPathWithoutDot(documentpath, key)}}" class="accordion-body collapse">
+                        <jsontable datasource="datasource[key]" document="document" documentpath="{{documentpath + '.' + key}}" />
+                    </div>
+                    <label ng-hide="ExpandedCols[documentpath + key]" data-toggle="collapse" data-target="#collapse_{{getPathWithoutDot(documentpath, key)}}" ng-click="changeColumnStatus(documentpath, key)">...</label>
+                </div>
+                <div ng-switch-when="emptyObject">
+                    <div class="cell" ng-show="!showEdit">
+                        <a class="btn btn-link" ng-click="showEdit=true">Add value</a>
+                    </div>
+                    <div class="input-append" ng-show="showEdit">
+                        <input type="text" class="span3" ng-model="innerState[key]" />
+                        <button class="btn btn-primary" type="button" ng-click="saveValue();showEdit=false;">Save</button>
+                        <button class="btn" type="button" ng-click="cancelValue();showEdit=false;">Cancel</button>
+                    </div>
+                </div>
+                <div ng-switch-when="null">
+                    not exists
+                </div>
+                <div ng-switch-default>
+                    <div class="cell" ng-show="!showEdit">
+                        <span class="v">{{val}}</span>
+                        <span class="pull-right btn btn-link edit-button" ng-click="showEdit=true"><i class="icon-pencil"></i></span>
+                        <span class="pull-right btn btn-link delete-button" data-toggle="modal" data-target="#deleteModal_{{getPathWithoutDot(documentpath, key)}}"><i class="icon-remove"></i></span>
+                        <modal modalid="deleteModal_{{getPathWithoutDot(documentpath, key)}}" caption="Delete an item" message="Are you sure you want to delete this item?" actionfunction="deleteItem()" />
+                    </div>
+                    <div class="input-append" ng-show="showEdit">
+                        <input type="text" class="span3" ng-model="innerState[key]" />
+                        <button class="btn btn-primary" type="button" ng-click="saveValue();showEdit=false;">Save</button>
+                        <button class="btn" type="button" ng-click="cancelValue();showEdit=false;">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
